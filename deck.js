@@ -1,5 +1,6 @@
 class Deck {
-  constructor() {
+  constructor(name) {
+    this.deckName = name;
     this.collection = [];
   };
 

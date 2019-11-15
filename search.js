@@ -11,11 +11,9 @@ var deck = new Deck();
 var querySearch = (arguments) => {
 
   var splitArguments = arguments.split(",");
-
   let card;
 
   splitArguments.forEach( function(argument) {
-
     var formatedArgument = argument.replace(/ /g,"-");
 
     apiCall = request('https://api.scryfall.com/cards//search?q=name:' + formatedArgument, function (error, response, body) {
@@ -25,20 +23,46 @@ var querySearch = (arguments) => {
       // return body;
       console.log("Card name:", card.name);
       console.log("Card text:", card.oracle_text);
-      readline.question(`\nWould you like to add it to your deck? (y/n)\n`, (arg) => {
-        if (arg.toLowerCase() == "y" || arg.toLowerCase() == "yes") {
-          deck.collection.push(card);
-          console.log("\nYou currently have these cards in your deck:");
-          deck.collection.forEach(deck.showDeck);
-          startingQuestion();
-        } else {
-          repeatQuestion();
-        }
-      });
+
+      questionAddCard(card);
+
     });
   });
 };
 
+// This ask to the user if she/he wants to add a card to the deck
+const questionAddCard = (card) => {
+  return new Promise((resolve, reject) => {
+    readline.question(`\nWould you like to add it to your deck? (y/n)\n`, (answer) => {
+      if (answer.toLowerCase() == "y" || answer.toLowerCase() == "yes") {
+        questionHowManyCard(card)
+      } else {
+        repeatQuestion();
+      }
+      resolve()
+    })
+  })
+}
+
+// This ask the user how many card she/he wants to add to the deck
+// It also adds the card(s) to the deck
+// It also shows the current status of the deck using the `deck.showDeck` function
+const questionHowManyCard = (card) => {
+  return new Promise((resolve, reject) => {
+    readline.question(`\nHow many would you like? \n`, (number) => {
+      for (var i = 0; i < number; i++) {
+        deck.collection.push(card);
+      }
+      console.log("\nYou currently have these cards in your deck:");
+      deck.collection.forEach(deck.showDeck);
+      startingQuestion();
+      resolve()
+    })
+  })
+}
+
+
+// The original question that ask the user what she/he wants to do
 var startingQuestion = () => {
   readline.question(`\nWhat do you want to do?\n1 - Search for a card?\n2 - See your deck status?\n3 - Close the app?\n`, (arg) => {
     if (arg == "1" || arg.toLowerCase() == "search") {

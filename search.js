@@ -33,7 +33,7 @@ var querySearch = (arguments) => {
 
 // The original question that ask the user what she/he wants to do
 var startingQuestion = () => {
-  readline.question(`\nWhat do you want to do?\n1 - Search for a card?\n2 - Create a new deck\n3 - See your deck status?\n4 - Close the app?\n`, (arg) => {
+  readline.question(`\nWhat do you want to do?\n1 - Search for a card?\n2 - Create a new deck\n3 - See your deck status?\n4 - Change deck\n5 - Close the app?\n`, (arg) => {
     if (arg == "1" || arg.toLowerCase() == "search") {
       queryQuestion();
     } else if (arg == "2" || arg.toLowerCase() == "new") {
@@ -42,7 +42,9 @@ var startingQuestion = () => {
       console.log("You currently have these cards in your deck:");
       currentDeck.collection.forEach(currentDeck.showDeck);
       startingQuestion();
-    } else if (arg == "4" || arg.toLowerCase() == "close") {
+    } else if (arg == "4" || arg.toLowerCase() == "change") {
+      changeCurrentDeck(deckCollection)
+    } else if (arg == "5" || arg.toLowerCase() == "close") {
       console.log('Bye 👋');
       readline.close();
     } else {
@@ -60,39 +62,66 @@ var queryQuestion = () => {
   });
 };
 
-
-var createNewDeck = () => {
+// Create a new instance of Deck, gives it a name and put it in the currentDeck variable
+// If there is already something in currentDeck, it saves the content it deckCollection
+var createNewDeck = (card) => {
   return new Promise((resolve, reject) => {
     readline.question(`\nWhat will be the name of your deck?\n`, (answer) => {
       var formatedName = answer.replace(/ /g,"-");
+      console.log("THIS IS currentDeck", Boolean(currentDeck));
       if (currentDeck) {
         deckCollection.push(currentDeck);
       }
       currentDeck = new Deck(formatedName);
+      if (card) {
+        questionAddCard(card);
+      } else {
+        startingQuestion();
+      };
+      resolve();
+    });
+  });
+};
+
+// List all the decks and query the user to say which one she/he wants to change
+var changeCurrentDeck = (deckCollection) => {
+  return new Promise((resolve, reject) => {
+    if (deckCollection.length == 0) {
+      console.log("\nYou have created no deck yet");
       startingQuestion();
-      resolve()
-    })
-  })
+    } else {
+      deckCollection.push(currentDeck)
+      console.log("This is deckCollection", deckCollection);
+      console.log(`\nThese are the current decks you have:\n`);
+      deckCollection.forEach(deck => console.log(deck.deckName));
+      readline.question(`Which one do you want to amend?\n`, (name) => {
+        var formatedName = name.replace(/ /g,"-");
+        currentDeck = deckCollection.find((deck) => deck.deckName === formatedName);
+        startingQuestion();
+      });
+    };
+    resolve();
+  });
 };
 
 
 // This ask to the user if she/he wants to add a card to the deck
 const questionAddCard = (card) => {
   return new Promise((resolve, reject) => {
-    readline.question(`\nWould you like to add it to your deck? (y/n)\n`, (answer) => {
+    readline.question(`\nWould you like to add "` + card.name + `" to your deck? (y/n)\n`, (answer) => {
       if (currentDeck) {
         if (answer.toLowerCase() == "y" || answer.toLowerCase() == "yes") {
-          questionHowManyCard(card)
+          questionHowManyCard(card);
         } else {
           repeatQuestion();
         }
       } else {
-        console.log("\nOh sorry, you seem to be missing a deck! You need to create one first.")
-        createNewDeck();
-      }
-      resolve()
-    })
-  })
+        console.log("\nOh sorry, you seem to be missing a deck! You need to create one first.");
+        createNewDeck(card);
+      };
+      resolve();
+    });
+  });
 };
 
 
@@ -108,9 +137,9 @@ const questionHowManyCard = (card) => {
       console.log("\nYou currently have these cards in your deck:");
       currentDeck.collection.forEach(currentDeck.showDeck);
       startingQuestion();
-      resolve()
-    })
-  })
+      resolve();
+    });
+  });
 };
 
 

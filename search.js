@@ -131,12 +131,17 @@ const questionAddCard = (card) => {
 const questionHowManyCard = (card) => {
   return new Promise((resolve, reject) => {
     readline.question(`\nHow many would you like? \n`, (number) => {
-      for (var i = 0; i < number; i++) {
-        currentDeck.collection.push(card);
+      if (number > 4) {
+        console.log("You can't add more than 4 cards");
+        questionHowManyCard(card);
+      } else {
+        for (var i = 0; i < number; i++) {
+          currentDeck.collection.push(card);
+        }
+        console.log("\nYou currently have these cards in your deck:");
+        currentDeck.collection.forEach(currentDeck.showDeck);
+        startingQuestion();
       }
-      console.log("\nYou currently have these cards in your deck:");
-      currentDeck.collection.forEach(currentDeck.showDeck);
-      startingQuestion();
       resolve();
     });
   });

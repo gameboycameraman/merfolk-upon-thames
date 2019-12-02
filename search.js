@@ -20,6 +20,12 @@ var querySearch = (arguments) => {
     apiCall = request('https://api.scryfall.com/cards//search?q=name:' + formatedArgument, function (error, response, body) {
       // console.log('error:', error); // Print the error if one occurred
       // console.log('statusCode:', response && response.statusCode); // Print the response status code if a response was received
+      if (response.statusCode == 404) {
+        console.log("Sorry love, we can't seem to find the card, maybe there is a typo?");
+        return readline.question(`\nWhich card(s) are you looking for?\n`, (arguments) => {
+          querySearch(arguments);
+        });
+      }
       card = JSON.parse(body).data[0]; // Print the HTML for the Google homepage.
       // return body;
       console.log("Card name:", card.name);

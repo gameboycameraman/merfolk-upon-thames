@@ -39,18 +39,20 @@ var querySearch = (arguments) => {
 
 // The original question that ask the user what she/he wants to do
 var startingQuestion = () => {
-  readline.question(`\nWhat do you want to do?\n1 - Search for a card?\n2 - Create a new deck\n3 - See your deck status?\n4 - Change deck\n5 - Close the app?\n`, (arg) => {
+  readline.question(`\nWhat do you want to do?\n1 - Search for a card?\n2 - Remove a card from the current deck \n3 - Create a new deck\n4 - See your deck status?\n5 - Change deck\n6 - Close the app?\n`, (arg) => {
     if (arg == "1" || arg.toLowerCase() == "search") {
       queryQuestion();
-    } else if (arg == "2" || arg.toLowerCase() == "new") {
+    } else if (arg == "2" || arg.toLowerCase() == "remove") {
+      questionRemoveCard();
+    } else if (arg == "3" || arg.toLowerCase() == "new") {
       createNewDeck()
-    } else if (arg == "3" || arg.toLowerCase() == "status") {
+    } else if (arg == "4" || arg.toLowerCase() == "status") {
       console.log("You currently have these cards in your deck:");
       currentDeck.collection.forEach(currentDeck.showDeck);
       startingQuestion();
-    } else if (arg == "4" || arg.toLowerCase() == "change") {
+    } else if (arg == "5" || arg.toLowerCase() == "change") {
       changeCurrentDeck(deckCollection)
-    } else if (arg == "5" || arg.toLowerCase() == "close") {
+    } else if (arg == "6" || arg.toLowerCase() == "close") {
       console.log('Bye 👋');
       readline.close();
     } else {
@@ -115,15 +117,16 @@ var changeCurrentDeck = (deckCollection) => {
 const questionAddCard = (card) => {
   return new Promise((resolve, reject) => {
     readline.question(`\nWould you like to add "` + card.name + `" to your deck? (y/n)\n`, (answer) => {
-      if (currentDeck) {
-        if (answer.toLowerCase() == "y" || answer.toLowerCase() == "yes") {
+
+      if (answer.toLowerCase() == "y" || answer.toLowerCase() == "yes") {
+        if (currentDeck) {
           questionHowManyCard(card);
         } else {
-          repeatQuestion();
+          console.log("\nOh sorry, you seem to be missing a deck! You need to create one first.");
+          createNewDeck(card);
         }
       } else {
-        console.log("\nOh sorry, you seem to be missing a deck! You need to create one first.");
-        createNewDeck(card);
+        repeatQuestion();
       };
       resolve();
     });
@@ -143,20 +146,62 @@ const questionHowManyCard = (card) => {
       } else {
         for (var i = 0; i < number; i++) {
           currentDeck.collection.push(card);
-        }
+        };
         console.log("\nYou currently have these cards in your deck:");
         currentDeck.collection.forEach(currentDeck.showDeck);
         startingQuestion();
-      }
+      };
       resolve();
     });
   });
 };
 
+const findName = () => {
+  return new Promise((resolve, reject) => {
+    readline.question(`\nWhat do you want to delete?\n`, (name) => {
+      return name;
+    });
+    resolve();
+  });
+};
+
+const findNumber = () => {
+  return new Promise((resolve, reject) => {
+    readline.question(`\nHow many?\n`, (number) => {
+      return number;
+    });
+    resolve();
+  });
+};
+
+const questionRemoveCard = () => {
+  return new Promise((resolve, reject) => {
+    var cardName = findName();
+    var numberOfCard = findNumber();
+    console.log("This is cardName", cardName);
+    console.log("This is numberOfCard", numberOfCard);
+    //WE ARE HERE
+    //WE ARE HERE
+    //WE ARE HERE
+    //it currently deletes cards before we are being asked to know which cards we want to delete.
+    if (numberOfCard > 4) {
+      console.log("You can't remove more than 4 cards");
+      questionRemoveCard();
+    } else {
+      for (var i = 0; i < numberOfCard; i++) {
+        currentDeck.collection.push(cardName);
+      };
+      console.log("\nYou currently have these cards in your deck:");
+      currentDeck.collection.forEach(currentDeck.showDeck);
+      startingQuestion();
+    };
+    resolve();
+  });
+};
 
 // This prompt the user if she/he wants to repeat the process
 var repeatQuestion = () => {
-  readline.question(`\nWould you like to perform a new search? (y/n)`, (answer) => {
+  readline.question(`\nWould you like to perform a new search? (y/n)\n`, (answer) => {
     if (answer == "yes" || answer == "y") {
       queryQuestion();
     } else {

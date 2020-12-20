@@ -8,4 +8,4 @@ This is a little app that only run in your terminal at the moment. It will help 
 To start, clone this repo. You will also need Node install on your machine. Finally run `npm i`.
 
 ## - Run
-at root level, run `node search`
+at root level, run `node ./src/search`

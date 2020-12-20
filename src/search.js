@@ -48,7 +48,7 @@ var startingQuestion = () => {
     } else if (arg == "3" || arg.toLowerCase() == "new") {
       createNewDeck()
     } else if (arg == "4" || arg.toLowerCase() == "status") {
-      console.log("You currently have these cards in your \"" + currentDeck.deckName + "\" deck:");
+      console.log("You currently have these cards in your \"" + currentDeck.name + "\" deck:");
       currentDeck.collection.forEach(currentDeck.showDeck);
       startingQuestion();
     } else if (arg == "5" || arg.toLowerCase() == "change") {
@@ -102,10 +102,10 @@ var changeCurrentDeck = (deckCollection) => {
       deckCollection.push(currentDeck)
       console.log("This is deckCollection", deckCollection);
       console.log(`\nThese are the current decks you have:\n`);
-      deckCollection.forEach(deck => console.log(deck.deckName));
+      deckCollection.forEach(deck => console.log(deck.name));
       readline.question(`Which one do you want to amend?\n`, (name) => {
         var formatedName = name.replace(/ /g,"-");
-        currentDeck = deckCollection.find((deck) => deck.deckName === formatedName);
+        currentDeck = deckCollection.find((deck) => deck.name === formatedName);
         startingQuestion();
       });
     };
@@ -141,17 +141,15 @@ const questionAddCard = (card) => {
 const questionHowManyCard = (card) => {
   return new Promise((resolve, reject) => {
     readline.question(`\nHow many would you like? \n`, (number) => {
-      if (number > 4) {
-        console.log("You can't add more than 4 cards");
+      try {
+        currentDeck.addCards(card, number);
+      } catch (err) {
+        console.log(err);
         questionHowManyCard(card);
-      } else {
-        for (var i = 0; i < number; i++) {
-          currentDeck.collection.push(card);
-        };
-        console.log("\nYou currently have these cards in your deck:");
-        currentDeck.collection.forEach(currentDeck.showDeck);
-        startingQuestion();
-      };
+      }
+      console.log("\nYou currently have these cards in your deck:");
+      currentDeck.collection.forEach(currentDeck.showDeck);
+      startingQuestion();
       resolve();
     });
   });
@@ -187,11 +185,7 @@ const questionRemoveCard = async () => {
     console.log("You can't remove more than 4 cards");
     questionRemoveCard();
   } else {
-    for (var i = 0; i < numberOfCard; i++) {
-      let cardToFind = (card) => card.name === cardName;
-      let cardToDelete = currentDeck.collection.findIndex(cardToFind);
-      currentDeck.collection.splice(cardToDelete, 1);
-    };
+    currentDeck.removeCards(cardName, numberOfCard)
     console.log("\nYou currently have these cards in your deck:");
     currentDeck.collection.forEach(currentDeck.showDeck);
     startingQuestion();

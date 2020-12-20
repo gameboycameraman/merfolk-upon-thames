@@ -29,6 +29,7 @@ var querySearch = (arguments) => {
       card = JSON.parse(body).data[0]; // Print the HTML for the Google homepage.
       // return body;
       console.log("Card name:", card.name);
+      console.log("Card type:", card.type_line);
       console.log("Card text:", card.oracle_text);
 
       questionAddCard(card);
@@ -47,7 +48,7 @@ var startingQuestion = () => {
     } else if (arg == "3" || arg.toLowerCase() == "new") {
       createNewDeck()
     } else if (arg == "4" || arg.toLowerCase() == "status") {
-      console.log("You currently have these cards in your deck:");
+      console.log("You currently have these cards in your \"" + currentDeck.deckName + "\" deck:");
       currentDeck.collection.forEach(currentDeck.showDeck);
       startingQuestion();
     } else if (arg == "5" || arg.toLowerCase() == "change") {
@@ -71,7 +72,7 @@ var queryQuestion = () => {
 };
 
 // Create a new instance of Deck, gives it a name and put it in the currentDeck variable
-// If there is already something in currentDeck, it saves the content it deckCollection
+// If there is already something in currentDeck, it saves the content in deckCollection
 var createNewDeck = (card) => {
   return new Promise((resolve, reject) => {
     readline.question(`\nWhat will be the name of your deck?\n`, (answer) => {
@@ -197,7 +198,7 @@ const questionRemoveCard = async () => {
   };
 };
 
-// This prompt the user if she/he wants to repeat the process
+// This prompt the user if they want to repeat the process
 var repeatQuestion = () => {
   readline.question(`\nWould you like to perform a new search? (y/n)\n`, (answer) => {
     if (answer == "yes" || answer == "y") {

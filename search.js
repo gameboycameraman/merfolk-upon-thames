@@ -159,44 +159,42 @@ const questionHowManyCard = (card) => {
 const findName = () => {
   return new Promise((resolve, reject) => {
     readline.question(`\nWhat do you want to delete?\n`, (name) => {
-      return name;
+      resolve(name);
     });
-    resolve();
   });
 };
 
 const findNumber = () => {
   return new Promise((resolve, reject) => {
     readline.question(`\nHow many?\n`, (number) => {
-      return number;
+      resolve(number);
     });
-    resolve();
   });
 };
 
-const questionRemoveCard = () => {
-  return new Promise((resolve, reject) => {
-    var cardName = findName();
-    var numberOfCard = findNumber();
-    console.log("This is cardName", cardName);
-    console.log("This is numberOfCard", numberOfCard);
-    //WE ARE HERE
-    //WE ARE HERE
-    //WE ARE HERE
-    //it currently deletes cards before we are being asked to know which cards we want to delete.
-    if (numberOfCard > 4) {
-      console.log("You can't remove more than 4 cards");
-      questionRemoveCard();
-    } else {
-      for (var i = 0; i < numberOfCard; i++) {
-        currentDeck.collection.push(cardName);
-      };
-      console.log("\nYou currently have these cards in your deck:");
-      currentDeck.collection.forEach(currentDeck.showDeck);
-      startingQuestion();
+// This prompt the user to name the card they want to delete
+// It also asks how many copies of the card they want to delete
+// Then we find the index position of the card in the array
+// And splice will start by checking where to delete and how many to delete from there
+// We could improve the splice method by using numberOfCard instead of hard coding 1
+// It would also remove the for loop
+// But we need to make sure they are enough copies of the card in the array before doing so, if not it might delete other cards
+const questionRemoveCard = async () => {
+  var cardName = await findName();
+  var numberOfCard = await findNumber();
+  if (numberOfCard > 4) {
+    console.log("You can't remove more than 4 cards");
+    questionRemoveCard();
+  } else {
+    for (var i = 0; i < numberOfCard; i++) {
+      let cardToFind = (card) => card.name === cardName;
+      let cardToDelete = currentDeck.collection.findIndex(cardToFind);
+      currentDeck.collection.splice(cardToDelete, 1);
     };
-    resolve();
-  });
+    console.log("\nYou currently have these cards in your deck:");
+    currentDeck.collection.forEach(currentDeck.showDeck);
+    startingQuestion();
+  };
 };
 
 // This prompt the user if she/he wants to repeat the process
